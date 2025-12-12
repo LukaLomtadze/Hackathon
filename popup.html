@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+      <h2>Smart Tab Manager</h2>
+  
+      <div class="buttonClass">
+        <button class="button" id="closeDuplicates">Close Duplicate Tabs</button>
+        <button class="button" id="inactive10sec">Close Inactive (> 10 sec)</button>
+        <button class="button" id="inactive30min">Close Inactive (> 30 min)</button>
+        <button class="button" id="inactive1hr">Close Inactive (> 1 hr)</button>
+        <button class="button" id="inactive2hr">Close Inactive (> 2 hr)</button>
+      </div>
+
+      <div class="customTimerBox">
+        <input type="number" id="customHours" placeholder="Enter hours" min="0" step="0.1">
+        <button class="button" id="customClose">Close Inactive (custom)</button>
+      </div>
+  
+      <div id="status"></div>
+    </div>
+  </body>  
+</html>
