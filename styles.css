@@ -1,90 +1,149 @@
 body {
-    background-color: #1e1e1e;
-    color: #fff;
-    font-family: Inter, Arial, sans-serif;
-    padding: 20px;
-    width: 260px;
+    background: #0D031B;
+    color: #e0e0e0;
+    font-family: 'Montserrat', 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    padding: 25px 15px;
+    width: 280px;
     margin: 0;
     text-align: center;
-
-    border-radius: 18px;
-    overflow: hidden;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-shadow: 0 0 5px rgba(224, 224, 224, 0.3);
 }
 
 
 /* Title */
 h2 {
-    margin-bottom: 16px;
-    font-size: 20px;
-    font-weight: 600;
-    color: #e9e9e9;
+    margin: 0 0 30px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #d0d0d0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 10px rgba(210, 208, 208, 0.8),
+                 0 0 20px rgba(210, 208, 208, 0.6),
+                 0 0 30px rgba(210, 208, 208, 0.4),
+                 0 0 40px rgba(167, 139, 250, 0.3);
 }
 
 /* Button Container */
 .buttonClass {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    margin: 20px 0;
+    align-items: center;
 }
 
 /* Buttons */
 .button {
-    background: #ffffff;
-    color: #000;
+    background: #a78bfa;
+    color: #0D031B;
     border: none;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 14px;
+    font-size: 13px;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.18s ease-in-out;
+    font-weight: 600;
+    transition: all 0.25s ease-in-out;
+    width: 85%;
+    max-width: 220px;
+    letter-spacing: 0.2px;
+    text-align: center;
+   
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.5),
+                0 0 20px rgba(167, 139, 250, 0.3);
 }
 
 /* Hover effect */
 .button:hover {
-    background: #d0d0d0;
-    transform: translateY(-1px);
+    background: #8b5cf6;
+    opacity: 0.95;
+    transform: scale(1.08);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.7),
+                0 0 30px rgba(139, 92, 246, 0.5),
+                0 0 45px rgba(139, 92, 246, 0.3);
+    
 }
 
 /* Active effect */
 .button:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
+    background: #7c3aed;
 }
 
 /* Status Text */
 #status {
-    margin-top: 10px;
-    font-size: 13px;
-    opacity: 0.8;
+    margin-top: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #d4a5ff;
+    letter-spacing: 0.2px;
+    text-align: center;
+   
 }
 
+
+/* Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
 
 .customBox {
     margin-top: 14px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-  }
-  
-  .customBox input,
-  .customBox select {
+    width: 85%;
+    max-width: 220px;
+    align-items: center;
+}
+
+.customBox input,
+.customBox select {
     padding: 10px;
-    border-radius: 10px;
-    border: none;
-    font-size: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
     outline: none;
-  }
+    background: rgba(167, 139, 250, 0.15);
+    color: #e0e0e0;
   
-  .inpCont {
+    box-shadow: 0 0 8px rgba(167, 139, 250, 0.2);
+    transition: all 0.25s ease-in-out;
+}
+
+.customBox input:focus,
+.customBox select:focus {
+    border-color: rgba(167, 139, 250, 0.6);
+    box-shadow: 0 0 12px rgba(167, 139, 250, 0.4),
+                0 0 20px rgba(167, 139, 250, 0.2);
+    background: rgba(167, 139, 250, 0.2);
+}
+
+.customBox input::placeholder {
+    color: #b0b0b0;
+    opacity: 0.7;
+}
+
+.inpCont {
     display: flex;
     gap: 8px;
-  }
-  
-  .inpCont input {
+    width: 100%;
+}
+
+.inpCont input {
     flex: 1;
-  }
-  
-  .inpCont select {
+}
+
+.inpCont select {
     width: 70px;
-  }
+}
   
