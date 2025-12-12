@@ -22,17 +22,3 @@ document.getElementById("inactive2hr").onclick = () => {
     chrome.runtime.sendMessage({ action: "closeInactive", limit: 2 * 60 * 60 * 1000 });
     window.close();
 };
-
-document.getElementById("customClose").onclick = () => {
-    const hours = parseFloat(document.getElementById("customHours").value);
-
-    if (!hours || hours <= 0) {
-        alert("Enter a valid number of hours");
-        return;
-    }
-
-    const limit = hours * 60 * 60 * 1000; // convert hours to ms
-
-    chrome.runtime.sendMessage({ action: "closeInactive", limit });
-    window.close();
-};

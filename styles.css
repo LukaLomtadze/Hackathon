@@ -56,20 +56,3 @@ h2 {
     font-size: 13px;
     opacity: 0.8;
 }
-
-
-.customTimerBox {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-#customHours {
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    font-size: 14px;
-    outline: none;
-    text-align: center;
-}
