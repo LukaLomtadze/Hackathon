@@ -9,11 +9,32 @@
   
       <div class="buttonClass">
         <button class="button" id="closeDuplicates">Close Duplicate Tabs</button>
-        <button class="button" id="inactive10sec">Close Inactive (> 10 sec)</button>
-        <button class="button" id="inactive30min">Close Inactive (> 30 min)</button>
-        <button class="button" id="inactive1hr">Close Inactive (> 1 hr)</button>
-        <button class="button" id="inactive2hr">Close Inactive (> 2 hr)</button>
+        <button class="button" id="inactive30min">Close Inactive >30 min</button>
+        <button class="button" id="inactive1hr">Close Inactive >1 hr</button>
       </div>
+
+      <div class="customBox">
+        <div class="inpCont">
+          <input
+            type="number"
+            id="customTime"
+            placeholder="Enter time"
+            min="1"
+          />
+      
+          <select id="customUnit">
+            <option value="minutes">Min</option>
+            <option value="hours">Hrs</option>
+          </select>
+        </div>
+      
+        <button class="button" id="customClose">
+          Close Inactive (Custom)
+        </button>
+      </div>
+      
+      
+      
 
       <div id="status"></div>
 

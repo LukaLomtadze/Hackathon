@@ -3,11 +3,6 @@ document.getElementById("closeDuplicates").onclick = () => {
     window.close();
 };
 
-document.getElementById("inactive10sec").onclick = () => {
-    chrome.runtime.sendMessage({ action: "closeInactive", limit: 10 * 1000 });
-    window.close();
-};
-
 document.getElementById("inactive30min").onclick = () => {
     chrome.runtime.sendMessage({ action: "closeInactive", limit: 30 * 60 * 1000 });
     window.close();
@@ -18,7 +13,33 @@ document.getElementById("inactive1hr").onclick = () => {
     window.close();
 };
 
-document.getElementById("inactive2hr").onclick = () => {
-    chrome.runtime.sendMessage({ action: "closeInactive", limit: 2 * 60 * 60 * 1000 });
+
+document.getElementById("customClose").onclick = () => {
+    const value = parseFloat(
+      document.getElementById("customTime").value
+    );
+    const unit = document.getElementById("customUnit").value;
+  
+    if (!value || value <= 0) {
+      alert("Enter a valid time value");
+      return;
+    }
+  
+    let limit;
+  
+    if (unit === "minutes") {
+      limit = value * 60 * 1000;
+    } else {
+      limit = value * 60 * 60 * 1000;
+    }
+  
+    chrome.runtime.sendMessage({
+      action: "closeInactive",
+      limit
+    });
+  
     window.close();
-};
+  };
+  
+
+  

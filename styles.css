@@ -11,6 +11,7 @@ body {
     overflow: hidden;
 }
 
+
 /* Title */
 h2 {
     margin-bottom: 16px;
@@ -56,3 +57,34 @@ h2 {
     font-size: 13px;
     opacity: 0.8;
 }
+
+
+.customBox {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .customBox input,
+  .customBox select {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    outline: none;
+  }
+  
+  .inpCont {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .inpCont input {
+    flex: 1;
+  }
+  
+  .inpCont select {
+    width: 70px;
+  }
+  

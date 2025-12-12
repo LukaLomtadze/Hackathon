@@ -20,6 +20,8 @@ chrome.tabs.onActivated.addListener(activeInfo => {
     });
 });
 
+
+
 async function closeInactiveTabs(limit) {
     const now = Date.now();
     const tabs = await chrome.tabs.query({});
