@@ -4,9 +4,6 @@ chrome.runtime.onMessage.addListener((msg) => {
     if (msg.action === "bookmark") bookmarkFunc();
 });
 
-const bookmarkFunc = () => {
-    console.log("rame")
-}
 
 async function closeDuplicateTabs() {
     const tabs = await chrome.tabs.query({});
@@ -47,3 +44,54 @@ async function closeInactiveTabs(limit) {
     }
 }
 
+
+
+const PROTECTED_KEY = "protectedTabs";
+
+async function getProtectedTabs() {
+    const data = await chrome.storage.local.get(PROTECTED_KEY);
+    return new Set(data[PROTECTED_KEY] || []);
+}
+
+async function addProtectedTab(tabId) {
+    const set = await getProtectedTabs();
+    set.add(tabId);
+    await chrome.storage.local.set({
+        [PROTECTED_KEY]: Array.from(set)
+    });
+}
+
+async function removeProtectedTab(tabId) {
+    const set = await getProtectedTabs();
+    set.delete(tabId);
+    await chrome.storage.local.set({
+        [PROTECTED_KEY]: Array.from(set)
+    });
+}
+
+
+async function bookmarkFunc() {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab) return;
+
+    // create bookmark
+    await chrome.bookmarks.create({
+        title: tab.title,
+        url: tab.url
+    });
+
+    // store protected tab
+    await addProtectedTab(tab.id);
+
+    // visually mark tab (⭐ prefix)
+    chrome.tabs.update(tab.id, {
+        title: "⭐ " + tab.title
+    });
+
+    // group tab
+    const groupId = await chrome.tabGroups.create({
+        tabIds: [tab.id],
+        title: "Protected",
+        color: "yellow"
+    });
+}
