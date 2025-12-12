@@ -1,7 +1,12 @@
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.action === "closeDuplicates") closeDuplicateTabs();
     if (msg.action === "closeInactive") closeInactiveTabs(msg.limit);
+    if (msg.action === "bookmark") bookmarkFunc();
 });
+
+const bookmarkFunc = () => {
+    console.log("rame")
+}
 
 async function closeDuplicateTabs() {
     const tabs = await chrome.tabs.query({});

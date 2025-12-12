@@ -13,6 +13,15 @@ document.getElementById("inactive1hr").onclick = () => {
     window.close();
 };
 
+document.getElementById("back").onclick = () => {
+  window.location.href = "maintabs.html";
+};
+
+document.getElementById("bookmark").onclick = () => {
+  chrome.runtime.sendMessage({action: "bookmark"})
+}
+
+
 
 document.getElementById("customClose").onclick = () => {
     const value = parseFloat(
@@ -39,7 +48,7 @@ document.getElementById("customClose").onclick = () => {
     });
   
     window.close();
-  };
+};
   
 
   
