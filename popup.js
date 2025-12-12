@@ -17,9 +17,17 @@ document.getElementById("back").onclick = () => {
   window.location.href = "maintabs.html";
 };
 
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.action === "bookmarkStatus") {
+      const btn = document.getElementById("bookmark");
+      btn.textContent = msg.added ? "Bookmark" : "Bookmarked";
+  }
+});
+
 document.getElementById("bookmark").onclick = () => {
-  chrome.runtime.sendMessage({action: "bookmark"})
-}
+  chrome.runtime.sendMessage({ action: "bookmark" });
+};
+
 
 
 
