@@ -1,0 +1,18 @@
+.ddiv{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.ddiv button{
+    width: 200px;
+}
+
+h2 {
+    position: relative;
+    z-index: 1;
+}
