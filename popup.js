@@ -196,72 +196,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (viewCapturesBtn) {
       viewCapturesBtn.addEventListener('click', async () => {
         try {
-          const data = await chrome.storage.local.get(['captures']);
-          const captures = data.captures || [];
-          
-          if (!Array.isArray(captures)) {
-            alert('No captures found or invalid data format');
-            return;
-          }
-          
-          // Helper function to escape HTML
-          function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-          }
-          
-          // Build HTML for captures display
-          let capturesHTML = '';
-          if (captures.length === 0) {
-            capturesHTML = '<p>No captures yet. Start capturing pages to see them here!</p>';
-          } else {
-            capturesHTML = captures.map(capture => {
-              if (!capture) return '';
-              const tags = Array.isArray(capture.tags) ? capture.tags.join(', ') : 'No tags';
-              const notes = capture.notes || 'No notes';
-              const title = capture.title || 'Untitled';
-              const url = capture.url || '#';
-              const screenshot = capture.screenshot || '';
-              const date = capture.timestamp ? new Date(capture.timestamp).toLocaleDateString() : 'Unknown date';
-              
-              return `
-                <div class="capture">
-                  <h3><a href="${escapeHtml(url)}" target="_blank">${escapeHtml(title)}</a></h3>
-                  <p><strong>Notes:</strong> ${escapeHtml(notes)}</p>
-                  <p><strong>Tags:</strong> ${escapeHtml(tags)} | <strong>Date:</strong> ${escapeHtml(date)}</p>
-                  ${screenshot ? `<img src="${escapeHtml(screenshot)}" alt="Screenshot" width="200">` : ''}
-                </div>
-              `;
-            }).join('');
-          }
-          
-          // Open new tab with captures
-          const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Captured Contexts</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .capture { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 4px; }
-    .capture h3 { margin-top: 0; }
-    .capture img { max-width: 200px; border: 1px solid #ccc; border-radius: 4px; }
-  </style>
-</head>
-<body>
-  <h1>Captured Contexts (${captures.length})</h1>
-  ${capturesHTML}
-</body>
-</html>`;
-          
-          const blob = new Blob([html], { type: 'text/html' });
-          const url = URL.createObjectURL(blob);
-          await chrome.tabs.create({ url: url });
+          // Open the captures.html file which has full Chrome API access
+          await chrome.tabs.create({ url: chrome.runtime.getURL('captures.html') });
         } catch (error) {
-          console.error('Error viewing captures:', error);
-          alert('Error loading captures: ' + error.message);
+          console.error('Error opening captures page:', error);
+          alert('Error opening captures page: ' + error.message);
         }
       });
     }

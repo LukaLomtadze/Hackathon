@@ -103,6 +103,40 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({ success: false, message: 'Import not implemented' });
     return true;
   }
+
+  if (msg.action === "deleteCapture") {
+    chrome.storage.local.get(['captures'], (data) => {
+      try {
+        let captures = data.captures || [];
+        const beforeCount = captures.length;
+        captures = captures.filter(c => {
+          if (!c || !c.id) return true;
+          return String(c.id) !== String(msg.captureId);
+        });
+        const afterCount = captures.length;
+        
+        if (beforeCount === afterCount) {
+          sendResponse({ success: false, message: 'Capture not found' });
+          return;
+        }
+        
+        chrome.storage.local.set({ captures: captures }, () => {
+          sendResponse({ success: true, count: captures.length });
+        });
+      } catch (e) {
+        console.error('Delete capture error:', e);
+        sendResponse({ success: false, message: e.message });
+      }
+    });
+    return true; // Keep message channel open for async response
+  }
+
+  if (msg.action === "deleteAllCaptures") {
+    chrome.storage.local.set({ captures: [] }, () => {
+      sendResponse({ success: true });
+    });
+    return true;
+  }
 });
 
 // =========================== //
