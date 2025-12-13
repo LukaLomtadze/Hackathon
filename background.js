@@ -3,6 +3,23 @@
 const PROTECTED_KEY = "protectedTabs";
 const UNDO_KEY = "undoStack";
 
+// Handle keyboard shortcut
+if (chrome.commands && chrome.commands.onCommand) {
+  chrome.commands.onCommand.addListener(async (command) => {
+    if (command === 'capture-context') {
+      try {
+        // Open the popup
+        await chrome.action.openPopup();
+      } catch (e) {
+        console.log('Could not open popup:', e);
+      }
+    }
+  });
+}
+
+// Listen for tab updates to auto-categorize (merged with existing listener below)
+// Note: This is handled by the onActivated listener for tracking active tabs
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "closeDuplicates") {
     closeDuplicateTabs();
@@ -53,6 +70,39 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
     return true;
   }
+
+  if (msg.action === "exportCaptures") {
+    chrome.storage.local.get(['captures'], (data) => {
+      try {
+        const captures = data.captures || [];
+        const json = JSON.stringify(captures, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        if (chrome.downloads && chrome.downloads.download) {
+          chrome.downloads.download({
+            url: url,
+            filename: `context-captures-${Date.now()}.json`,
+            saveAs: true
+          });
+          sendResponse({ success: true });
+        } else {
+          sendResponse({ success: false, message: 'Downloads API not available' });
+        }
+      } catch (e) {
+        console.error('Export error:', e);
+        sendResponse({ success: false, message: e.message });
+      }
+    });
+    return true; // Keep message channel open for async response
+  }
+  
+  if (msg.action === "importCaptures") {
+    // Handle import
+    // This would require a file picker, more complex
+    sendResponse({ success: false, message: 'Import not implemented' });
+    return true;
+  }
 });
 
 // =========================== //
@@ -60,18 +110,19 @@ async function controlZFunc() {
   // First try our internal undo stack (pop last batch). If empty, fall back to Sessions API.
   try {
     const batch = await popUndoBatch();
-    if (batch && batch.entries && batch.entries.length) {
+    if (batch && batch.entries && Array.isArray(batch.entries) && batch.entries.length) {
       // Restore entries in original order
       for (let i = 0; i < batch.entries.length; i++) {
         const e = batch.entries[i];
+        if (!e || !e.url) continue; // Skip invalid entries
         try {
           // Create tab in the original window if possible
           await new Promise((res) => {
             chrome.tabs.create(
               {
-                windowId: e.windowId,
+                windowId: e.windowId || undefined,
                 url: e.url,
-                index: e.index,
+                index: e.index || undefined,
                 active: false,
               },
               () => res()
@@ -302,9 +353,13 @@ async function closeDuplicateTabs() {
 }
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    chrome.storage.local.set({ [tab.id]: Date.now() });
-  });
+  if (activeInfo && activeInfo.tabId) {
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+      if (tab && tab.id) {
+        chrome.storage.local.set({ [tab.id]: Date.now() });
+      }
+    });
+  }
 });
 
 // ============================ //
@@ -315,7 +370,7 @@ async function closeInactiveTabs(limit) {
   const protectedTabs = await getProtectedTabs();
 
   const active = await chrome.tabs.query({ active: true, currentWindow: true });
-  const activeTabId = active[0]?.id;
+  const activeTabId = active && active.length > 0 ? active[0].id : null;
 
   const removedEntries = [];
   for (let tab of tabs) {
@@ -346,7 +401,9 @@ async function closeInactiveTabs(limit) {
 }
 
 chrome.tabs.onRemoved.addListener(async (tabId) => {
-  await removeProtectedTab(tabId);
+  if (tabId) {
+    await removeProtectedTab(tabId);
+  }
 });
 
 // ============================ //
@@ -430,3 +487,26 @@ async function popUndoBatch() {
     return null;
   }
 }
+
+// Clean up old captures (optional)
+setInterval(async () => {
+  try {
+    const data = await chrome.storage.local.get(['captures']);
+    const captures = data.captures || [];
+    
+    if (!Array.isArray(captures)) return;
+    
+    // Remove captures older than 90 days
+    const ninetyDaysAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);
+    const filteredCaptures = captures.filter(capture => 
+      capture && capture.timestamp && capture.timestamp > ninetyDaysAgo
+    );
+    
+    if (filteredCaptures.length < captures.length) {
+      await chrome.storage.local.set({ captures: filteredCaptures });
+      console.log(`Cleaned up ${captures.length - filteredCaptures.length} old captures`);
+    }
+  } catch (e) {
+    console.error('Cleanup error:', e);
+  }
+}, 24 * 60 * 60 * 1000); // Run daily

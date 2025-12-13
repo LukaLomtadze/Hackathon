@@ -7,7 +7,7 @@
     "default_popup": "maintabs.html",
     "default_icon": "icon.png"
   },
-  "permissions": ["tabs", "storage", "bookmarks", "tabGroups"],
+  "permissions": ["tabs", "storage", "bookmarks", "tabGroups", "sessions", "downloads", "scripting"],
   "background": {
     "service_worker": "background.js"
   }

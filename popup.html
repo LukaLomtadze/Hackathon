@@ -1,66 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 400px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h3 {
+      margin: 0;
+      color: #333;
+    }
+    .header p {
+      margin: 5px 0 0;
+      color: #666;
+      font-size: 12px;
+    }
+    .screenshot-container {
+      margin: 15px 0;
+      text-align: center;
+    }
+    #screenshot {
+      max-width: 100%;
+      max-height: 150px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #333;
+    }
+    textarea, select, input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 60px;
+      resize: vertical;
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+    }
+    .tag {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tag:hover {
+      background: #bbdefb;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    #captureBtn {
+      background: #1976d2;
+      color: white;
+    }
+    #captureBtn:hover {
+      background: #1565c0;
+    }
+    #cancelBtn {
+      background: #f5f5f5;
+      color: #666;
+    }
+    #cancelBtn:hover {
+      background: #e0e0e0;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+    }
+    .success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+    }
+    .error {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+    }
+  </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    <button class="back" id="back"><</button>
-    <div class="container">
-      <h2>Smart Tab Manager</h2>
-  
-      <div class="buttonClass">
-        <button class="button" id="closeDuplicates">Close Duplicate Tabs</button>
-        <button class="button" id="inactive30min">Close Inactive >30 min</button>
-        <button class="button" id="inactive1hr">Close Inactive >1 hr</button>
-      </div>
+  <div class="header">
+    <h3>📸 Capture Context</h3>
+    <p>Save this page with notes and context</p>
+  </div>
 
-      <div class="customBox">
-        <div class="inpCont">
-          <div class="number-input-wrapper">
-            <input
-              type="number"
-              id="customTime"
-              placeholder="Enter time"
-              min="1"
-            />
-            <div class="number-controls">
-              <button type="button" class="number-btn number-btn-up" id="timeUp"><span class="arrow-up"></span></button>
-              <button type="button" class="number-btn number-btn-down" id="timeDown"><span class="arrow-down"></span></button>
-            </div>
-          </div>
-      
-          <div class="custom-select-wrapper">
-            <div class="custom-select" id="customUnitSelect">
-              <div class="custom-select-trigger">
-                <span id="customUnitText">Min</span>
-                <span class="custom-select-arrow"><span class="arrow-down"></span></span>
-              </div>
-              <div class="custom-select-options" id="customUnitOptions">
-                <div class="custom-select-option" data-value="minutes">Min</div>
-                <div class="custom-select-option" data-value="hours">Hrs</div>
-              </div>
-            </div>
-            <select id="customUnit" style="display: none;">
-              <option value="minutes">Min</option>
-              <option value="hours">Hrs</option>
-            </select>
-          </div>
-        </div>
-      
-        <button class="button" id="customClose">Close Inactive (Custom)</button>
-        <button class="button" id="bookmark">Bookmark</button>
-        <button class="button" id="group">Group Tabs</button>
-        <button class="button" id="ungroup">Ungroup Tabs</button>
-        <button class="button" id="control-z">CTRL Z</button>
-      </div>
+  <div class="screenshot-container">
+    <img id="screenshot" src="" alt="Page preview">
+  </div>
 
-      <div id="status"></div>
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input type="text" id="title" placeholder="Page title...">
+  </div>
 
-      <script src="popup.js"></script>
+  <div class="form-group">
+    <label for="notes">Why is this important?</label>
+    <textarea id="notes" placeholder="Add your notes here..."></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="category">Category</label>
+    <select id="category">
+      <option value="research">🔬 Research</option>
+      <option value="reference">📚 Reference</option>
+      <option value="todo">✅ Todo</option>
+      <option value="inspiration">💡 Inspiration</option>
+      <option value="learning">🎓 Learning</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Tags</label>
+    <div class="tags-container" id="tagsContainer">
+      <!-- Tags will be added here -->
     </div>
-  </body>  
+    <input type="text" id="newTag" placeholder="Add a tag and press Enter" style="margin-top: 8px;">
+  </div>
+
+  <div class="form-group">
+    <label for="priority">Priority</label>
+    <select id="priority">
+      <option value="low">Low</option>
+      <option value="medium" selected>Medium</option>
+      <option value="high">High</option>
+    </select>
+  </div>
+
+  <div class="actions">
+    <button id="cancelBtn">Cancel</button>
+    <button id="captureBtn">Capture</button>
+  </div>
+
+  <button id="viewCapturesBtn" style="margin-top: 10px; width: 100%;">View All Captures</button>
+
+  <div id="status" class="status"></div>
+
+  <script src="popup.js"></script>
+</body>
 </html>

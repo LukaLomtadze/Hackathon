@@ -1,9 +1,9 @@
 document.getElementById("goTabs").onclick = () => {
-    window.location.href = "popup.html";
+    window.location.href = "tabs.html";
 };
 
 document.getElementById("goMessages").onclick = () => {
-    window.location.href = "messages.html";
+    window.location.href = "popup.html";
 };
 
 // Lofi Particle Animation

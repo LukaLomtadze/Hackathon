@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <button class="back" id="back"><</button>
+    <div class="container">
+      <h2>Smart Tab Manager</h2>
+  
+      <div class="buttonClass">
+        <button class="button" id="closeDuplicates">Close Duplicate Tabs</button>
+        <button class="button" id="inactive30min">Close Inactive >30 min</button>
+        <button class="button" id="inactive1hr">Close Inactive >1 hr</button>
+      </div>
+
+      <div class="customBox">
+        <div class="inpCont">
+          <div class="number-input-wrapper">
+            <input
+              type="number"
+              id="customTime"
+              placeholder="Enter time"
+              min="1"
+            />
+            <div class="number-controls">
+              <button type="button" class="number-btn number-btn-up" id="timeUp"><span class="arrow-up"></span></button>
+              <button type="button" class="number-btn number-btn-down" id="timeDown"><span class="arrow-down"></span></button>
+            </div>
+          </div>
+      
+          <div class="custom-select-wrapper">
+            <div class="custom-select" id="customUnitSelect">
+              <div class="custom-select-trigger">
+                <span id="customUnitText">Min</span>
+                <span class="custom-select-arrow"><span class="arrow-down"></span></span>
+              </div>
+              <div class="custom-select-options" id="customUnitOptions">
+                <div class="custom-select-option" data-value="minutes">Min</div>
+                <div class="custom-select-option" data-value="hours">Hrs</div>
+              </div>
+            </div>
+            <select id="customUnit" style="display: none;">
+              <option value="minutes">Min</option>
+              <option value="hours">Hrs</option>
+            </select>
+          </div>
+        </div>
+      
+        <button class="button" id="customClose">Close Inactive (Custom)</button>
+        <button class="button" id="bookmark">Bookmark</button>
+        <button class="button" id="group">Group Tabs</button>
+        <button class="button" id="ungroup">Ungroup Tabs</button>
+        <button class="button" id="control-z">CTRL Z</button>
+      </div>
+
+      <div id="status"></div>
+
+      <script src="tabs.js"></script>
+    </div>
+  </body>  
+</html>
