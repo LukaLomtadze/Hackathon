@@ -300,7 +300,7 @@ async function ungroupFunc() {
 
 // ============================ //
 async function closeDuplicateTabs() {
-  const tabs = await chrome.tabs.query({});
+    const tabs = await chrome.tabs.query({});
   const protectedTabs = await getProtectedTabs();
 
   console.log(
@@ -398,23 +398,23 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 
 // ============================ //
 async function closeInactiveTabs(limit) {
-  const now = Date.now();
-  const tabs = await chrome.tabs.query({});
-  const stored = await chrome.storage.local.get(null);
+    const now = Date.now();
+    const tabs = await chrome.tabs.query({});
+    const stored = await chrome.storage.local.get(null);
   const protectedTabs = await getProtectedTabs();
 
-  const active = await chrome.tabs.query({ active: true, currentWindow: true });
+    const active = await chrome.tabs.query({ active: true, currentWindow: true });
   const activeTabId = active && active.length > 0 ? active[0].id : null;
 
   const removedEntries = [];
-  for (let tab of tabs) {
+    for (let tab of tabs) {
     if (protectedTabs.has(tab.id)) continue; // skip protected
     if (tab.id === activeTabId) continue;
 
-    const lastActive = stored[tab.id];
-    if (!lastActive) continue;
+        const lastActive = stored[tab.id];
+        if (!lastActive) continue;
 
-    if (now - lastActive > limit) {
+        if (now - lastActive > limit) {
       try {
         removedEntries.push({
           id: tab.id,
@@ -424,12 +424,12 @@ async function closeInactiveTabs(limit) {
           windowId: tab.windowId,
           time: Date.now(),
         });
-        chrome.tabs.remove(tab.id);
+            chrome.tabs.remove(tab.id);
       } catch (e) {
         console.warn(e);
-      }
+        }
     }
-  }
+}
 
   if (removedEntries.length) await pushUndoBatch(removedEntries);
 }
@@ -442,8 +442,8 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
 
 // ============================ //
 async function getProtectedTabs() {
-  const data = await chrome.storage.local.get(PROTECTED_KEY);
-  return new Set(data[PROTECTED_KEY] || []);
+    const data = await chrome.storage.local.get(PROTECTED_KEY);
+    return new Set(data[PROTECTED_KEY] || []);
 }
 
 // ============================ //
@@ -453,25 +453,25 @@ async function setProtectedTabsSet(set) {
 
 // ============================ //
 async function addProtectedTab(tabId) {
-  const set = await getProtectedTabs();
+    const set = await getProtectedTabs();
   if (set.has(tabId)) return false;
-  set.add(tabId);
+    set.add(tabId);
   await setProtectedTabsSet(set);
   return true;
 }
 
 // ============================ //
 async function removeProtectedTab(tabId) {
-  const set = await getProtectedTabs();
+    const set = await getProtectedTabs();
   if (!set.has(tabId)) return false;
-  set.delete(tabId);
+    set.delete(tabId);
   await setProtectedTabsSet(set);
   return true;
 }
 
 // ============================ //
 async function toggleProtectedForActiveTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return false;
 
   const set = await getProtectedTabs();
@@ -542,5 +542,5 @@ setInterval(async () => {
     }
   } catch (e) {
     console.error('Cleanup error:', e);
-  }
+}
 }, 24 * 60 * 60 * 1000); // Run daily
