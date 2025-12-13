@@ -156,3 +156,4 @@ if (document.readyState === 'loading') {
 } else {
   loadCaptures();
 }
+
