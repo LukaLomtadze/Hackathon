@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Smart Tab Manager (demo)",
-  "version": "1.0.5",
+  "version": "1.0.43",
   "description": "Automatically detects duplicate tabs, closes inactive tabs, and improves productivity.",
   "action": {
     "default_popup": "maintabs.html",

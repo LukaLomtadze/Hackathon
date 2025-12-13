@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <button class="back" id="back"><</button>
     <div class="container1">
       <h2>Smart Tab Manager</h2>
-  
+
       <div class="buttonClass">
-        <button class="button" id="closeDuplicates">Close Duplicate Tabs</button>
-        <button class="button" id="inactive30min">Close Inactive >30 min</button>
+        <button class="button" id="closeDuplicates">
+          Close Duplicate Tabs
+        </button>
+        <button class="button" id="inactive30min">
+          Close Inactive >30 min
+        </button>
         <button class="button" id="inactive1hr">Close Inactive >1 hr</button>
       </div>
 
@@ -22,23 +26,24 @@
             placeholder="Enter time"
             min="1"
           />
-      
+
           <select id="customUnit">
             <option value="minutes">Min</option>
             <option value="hours">Hrs</option>
           </select>
         </div>
-      
-        <button class="button" id="customClose">
-          Close Inactive (Custom)
-        </button>
+
+        <button class="button" id="customClose">Close Inactive (Custom)</button>
+
         <button class="button" id="bookmark">Bookmark</button>
+        <button class="button" id="group">Group Tabs</button>
+        <button class="button" id="ungroup">Ungroup Tabs</button>
+        <button class="button" id="control-z">CTRL Z</button>
       </div>
-      
 
       <div id="status"></div>
 
       <script src="popup.js"></script>
     </div>
-  </body>  
+  </body>
 </html>
