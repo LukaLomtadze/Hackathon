@@ -1,4 +1,3 @@
-// Helper function to escape HTML
 function escapeHtml(text) {
   if (!text) return '';
   const div = document.createElement('div');
@@ -6,19 +5,16 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Load captures from storage
 async function loadCaptures() {
   try {
     const data = await chrome.storage.local.get(['captures']);
     const captures = data.captures || [];
     renderCaptures(captures);
   } catch (error) {
-    console.error('Error loading captures:', error);
     showMessage('Error loading captures', 'error');
   }
 }
 
-// Render captures to the page
 function renderCaptures(captures) {
   const container = document.getElementById('capturesContainer');
   const titleElement = document.querySelector('#title');
@@ -60,34 +56,25 @@ function renderCaptures(captures) {
     `;
   }).join('');
   
-  // Re-attach event listeners after rendering
   attachDeleteListeners();
 }
 
-// Attach delete button listeners
 function attachDeleteListeners() {
-  const deleteButtons = document.querySelectorAll('.delete-btn');
-  deleteButtons.forEach(btn => {
-    // Remove existing listeners by cloning
+  document.querySelectorAll('.delete-btn').forEach(btn => {
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
-    
     newBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const captureId = newBtn.getAttribute('data-capture-id');
-      if (captureId) {
-        deleteCapture(captureId);
-      }
+      const id = newBtn.getAttribute('data-capture-id');
+      if (id) deleteCapture(id);
     });
   });
-  
   const deleteAllBtn = document.getElementById('deleteAllBtn');
   if (deleteAllBtn) {
     const newBtn = deleteAllBtn.cloneNode(true);
     deleteAllBtn.parentNode.replaceChild(newBtn, deleteAllBtn);
     newBtn.id = 'deleteAllBtn';
-    
     newBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -135,7 +122,6 @@ async function deleteAllCaptures() {
     renderCaptures([]);
     showMessage('All captures deleted successfully!', 'success');
   } catch (error) {
-    console.error('Delete all error:', error);
     showMessage('Error deleting captures: ' + error.message, 'error');
   }
 }
@@ -151,7 +137,6 @@ function showMessage(text, type) {
   }, 3000);
 }
 
-// Back button handler
 const backBtn = document.getElementById('back');
 if (backBtn) {
   backBtn.addEventListener('click', () => {
@@ -159,7 +144,6 @@ if (backBtn) {
   });
 }
 
-// Lofi Particle Animation
 function createParticles() {
   const particlesContainer = document.getElementById('particles');
   if (!particlesContainer) return;
@@ -205,12 +189,9 @@ function createParticles() {
   }
 }
 
-// Initialize particles when page loads
 createParticles();
 
-// Global mouse interaction - particles react to mouse movement
-let mouseX = 0;
-let mouseY = 0;
+let mouseX = 0, mouseY = 0;
 
 document.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
@@ -240,7 +221,6 @@ document.addEventListener('mousemove', (e) => {
   });
 });
 
-// Reset particles when mouse leaves
 document.addEventListener('mouseleave', () => {
   const particles = document.querySelectorAll('.particle');
   particles.forEach((particle) => {
@@ -249,7 +229,6 @@ document.addEventListener('mouseleave', () => {
   });
 });
 
-// Load captures on page load
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadCaptures);
 } else {

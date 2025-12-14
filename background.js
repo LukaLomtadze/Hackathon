@@ -1,24 +1,15 @@
-// (removed legacy message listener)
-
 const PROTECTED_KEY = "protectedTabs";
 const UNDO_KEY = "undoStack";
 
-// Handle keyboard shortcut
-if (chrome.commands && chrome.commands.onCommand) {
+if (chrome.commands?.onCommand) {
   chrome.commands.onCommand.addListener(async (command) => {
     if (command === 'capture-context') {
       try {
-        // Open the popup
         await chrome.action.openPopup();
-      } catch (e) {
-        console.log('Could not open popup:', e);
-      }
+      } catch (e) {}
     }
   });
 }
-
-// Listen for tab updates to auto-categorize (merged with existing listener below)
-// Note: This is handled by the onActivated listener for tracking active tabs
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "closeDuplicates") {
@@ -49,9 +40,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "bookmark") {
     toggleProtectedForActiveTab().then(async (added) => {
       const set = await getProtectedTabs();
-      const arr = Array.from(set);
-      console.log("Protected set:", arr);
-      sendResponse({ added, protected: arr });
+      sendResponse({ added, protected: Array.from(set) });
       chrome.runtime.sendMessage({
         action: "bookmarkStatus",
         added,
@@ -64,9 +53,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "getBookmarkStatus") {
     isActiveTabProtected().then(async (added) => {
       const set = await getProtectedTabs();
-      const arr = Array.from(set);
-      console.log("Protected set:", arr);
-      sendResponse({ added, protected: arr });
+      sendResponse({ added, protected: Array.from(set) });
     });
     return true;
   }
@@ -98,8 +85,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   
   if (msg.action === "importCaptures") {
-    // Handle import
-    // This would require a file picker, more complex
     sendResponse({ success: false, message: 'Import not implemented' });
     return true;
   }
@@ -139,18 +124,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-// =========================== //
 async function controlZFunc() {
-  // First try our internal undo stack (pop last batch). If empty, fall back to Sessions API.
   try {
     const batch = await popUndoBatch();
     if (batch && batch.entries && Array.isArray(batch.entries) && batch.entries.length) {
       // Restore entries in original order
       for (let i = 0; i < batch.entries.length; i++) {
         const e = batch.entries[i];
-        if (!e || !e.url) continue; // Skip invalid entries
+        if (!e?.url) continue;
         try {
-          // Create tab in the original window if possible
           await new Promise((res) => {
             chrome.tabs.create(
               {
@@ -178,58 +160,32 @@ async function controlZFunc() {
     }
 
     chrome.sessions.getRecentlyClosed(async (items) => {
-      if (!items || !items.length) {
-        console.log("No recently closed sessions available");
-        return;
-      }
-
+      if (!items?.length) return;
       const newest = items[0].lastModified || Date.now();
-      const WINDOW_MS = 5000;
-      const cutoff = newest - WINDOW_MS;
-
+      const cutoff = newest - 5000;
       const toRestore = [];
       for (const it of items) {
         const lm = it.lastModified || 0;
         if (lm >= cutoff) toRestore.push(it);
         else break;
       }
-
-      if (!toRestore.length) {
-        console.log(
-          "No recently-closed entries within the time window to restore"
-        );
-        return;
-      }
-
+      if (!toRestore.length) return;
       for (let i = toRestore.length - 1; i >= 0; i--) {
-        const entry = toRestore[i];
-        const sid =
-          entry.tab?.sessionId || entry.window?.sessionId || entry.sessionId;
-        if (!sid) continue;
-        try {
-          chrome.sessions.restore(sid, (restored) => {
-            console.log(
-              "restored session",
-              sid,
-              restored && restored.tab && restored.tab.id
-            );
-          });
-        } catch (e) {
-          console.warn("Failed to restore session", sid, e);
+        const sid = toRestore[i].tab?.sessionId || toRestore[i].window?.sessionId || toRestore[i].sessionId;
+        if (sid) {
+          try {
+            chrome.sessions.restore(sid);
+          } catch (e) {}
         }
       }
     });
-  } catch (e) {
-    console.error("controlZFunc error", e);
-  }
+  } catch (e) {}
 }
 
-// =========================== //
 async function groupFunc() {
   try {
     const tabs = await chrome.tabs.query({});
 
-    // Group tabs by hostname so different paths on same site group together
     const groups = new Map();
     for (const tab of tabs) {
       const raw = tab.url || "";
@@ -237,7 +193,6 @@ async function groupFunc() {
       try {
         host = new URL(raw).hostname.replace(/^www\./, "");
       } catch (e) {
-        // fallback to raw URL for chrome://, about:blank, etc.
         host = raw;
       }
 
@@ -246,33 +201,24 @@ async function groupFunc() {
     }
 
     for (const [host, group] of groups) {
-      if (group.length <= 1) continue; // unique site, nothing to group
+      if (group.length <= 1) continue;
 
       const tabIds = group.map((t) => t.id);
 
       try {
         const groupId = await chrome.tabs.group({ tabIds });
 
-        // Use hostname as group title when possible
         const title = host && host.length ? host : undefined;
         if (typeof chrome.tabGroups !== "undefined") {
           try {
             await chrome.tabGroups.update(groupId, { title, color: "blue" });
-          } catch (e) {
-            console.error("tabGroups.update failed", e);
-          }
+          } catch (e) {}
         }
-      } catch (err) {
-        console.error("Failed to group tabs for host", host, err);
-      }
+      } catch (err) {}
     }
-  } catch (e) {
-    console.error("groupFunc error", e);
-  }
+  } catch (e) {}
 }
 
-// Ungroup all tabs that belong to any tab group
-// ============================ //
 async function ungroupFunc() {
   try {
     const tabs = await chrome.tabs.query({});
@@ -286,52 +232,26 @@ async function ungroupFunc() {
     try {
       await chrome.tabs.ungroup(tabIds);
     } catch (e) {
-      // fallback: try ungrouping one by one
       for (const id of tabIds) {
         try {
           await chrome.tabs.ungroup(id);
         } catch (err) {}
       }
     }
-  } catch (e) {
-    console.error("ungroupFunc error", e);
-  }
+  } catch (e) {}
 }
 
-// ============================ //
 async function closeDuplicateTabs() {
     const tabs = await chrome.tabs.query({});
   const protectedTabs = await getProtectedTabs();
 
-  console.log(
-    "closeDuplicateTabs: total tabs=",
-    tabs.length,
-    "protected count=",
-    protectedTabs.size
-  );
-
-  // Group tabs by normalized URL (strip query/hash and trailing slash)
   const groups = new Map();
   for (const tab of tabs) {
     let url = (tab.url || "").split("#")[0].split("?")[0];
-    // remove trailing slash
     if (url.endsWith("/")) url = url.replace(/\/+$/, "");
     url = url.trim();
     if (!groups.has(url)) groups.set(url, []);
     groups.get(url).push(tab);
-  }
-
-  // Debug: log groups with more than one tab
-  for (const [u, g] of groups) {
-    if (g.length > 1)
-      console.log(
-        "duplicate group:",
-        u,
-        "count=",
-        g.length,
-        "tabIds=",
-        g.map((t) => t.id)
-      );
   }
   // For each group of duplicates, if any tab is protected, remove only unprotected ones.
   // Otherwise remove all but the first tab.
@@ -345,7 +265,6 @@ async function closeDuplicateTabs() {
       for (const t of group) {
         if (!protectedTabs.has(t.id)) {
           try {
-            console.log("closing unprotected duplicate tab", t.id, t.url);
             removedEntries.push({
               id: t.id,
               url: t.url,
@@ -355,18 +274,12 @@ async function closeDuplicateTabs() {
               time: Date.now(),
             });
             chrome.tabs.remove(t.id);
-          } catch (e) {
-            console.warn(e);
-          }
-        } else {
-          console.log("preserving protected tab", t.id, t.url);
+          } catch (e) {}
         }
       }
     } else {
-      // keep the first, close the rest
       for (let i = 1; i < group.length; i++) {
         try {
-          console.log("closing duplicate tab", group[i].id, group[i].url);
           removedEntries.push({
             id: group[i].id,
             url: group[i].url,
@@ -376,9 +289,7 @@ async function closeDuplicateTabs() {
             time: Date.now(),
           });
           chrome.tabs.remove(group[i].id);
-        } catch (e) {
-          console.warn(e);
-        }
+        } catch (e) {}
       }
     }
   }
@@ -387,16 +298,13 @@ async function closeDuplicateTabs() {
 }
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  if (activeInfo && activeInfo.tabId) {
+  if (activeInfo?.tabId) {
     chrome.tabs.get(activeInfo.tabId, (tab) => {
-      if (tab && tab.id) {
-        chrome.storage.local.set({ [tab.id]: Date.now() });
-      }
+      if (tab?.id) chrome.storage.local.set({ [tab.id]: Date.now() });
     });
   }
 });
 
-// ============================ //
 async function closeInactiveTabs(limit) {
     const now = Date.now();
     const tabs = await chrome.tabs.query({});
@@ -425,9 +333,7 @@ async function closeInactiveTabs(limit) {
           time: Date.now(),
         });
             chrome.tabs.remove(tab.id);
-      } catch (e) {
-        console.warn(e);
-        }
+        } catch (e) {}
     }
 }
 
@@ -440,18 +346,15 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
   }
 });
 
-// ============================ //
 async function getProtectedTabs() {
     const data = await chrome.storage.local.get(PROTECTED_KEY);
     return new Set(data[PROTECTED_KEY] || []);
 }
 
-// ============================ //
 async function setProtectedTabsSet(set) {
   await chrome.storage.local.set({ [PROTECTED_KEY]: Array.from(set) });
 }
 
-// ============================ //
 async function addProtectedTab(tabId) {
     const set = await getProtectedTabs();
   if (set.has(tabId)) return false;
@@ -469,7 +372,6 @@ async function removeProtectedTab(tabId) {
   return true;
 }
 
-// ============================ //
 async function toggleProtectedForActiveTab() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return false;
@@ -486,7 +388,6 @@ async function toggleProtectedForActiveTab() {
   return !wasProtected;
 }
 
-// ============================ //
 async function isActiveTabProtected() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return false;
@@ -500,12 +401,9 @@ async function pushUndoBatch(entries) {
     const data = await chrome.storage.local.get(UNDO_KEY);
     const stack = data[UNDO_KEY] || [];
     stack.push({ time: Date.now(), entries });
-    const MAX = 30;
-    while (stack.length > MAX) stack.shift();
+    while (stack.length > 30) stack.shift();
     await chrome.storage.local.set({ [UNDO_KEY]: stack });
-  } catch (e) {
-    console.error("pushUndoBatch error", e);
-  }
+  } catch (e) {}
 }
 
 async function popUndoBatch() {
@@ -522,25 +420,15 @@ async function popUndoBatch() {
   }
 }
 
-// Clean up old captures (optional)
 setInterval(async () => {
   try {
     const data = await chrome.storage.local.get(['captures']);
     const captures = data.captures || [];
-    
     if (!Array.isArray(captures)) return;
-    
-    // Remove captures older than 90 days
-    const ninetyDaysAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);
-    const filteredCaptures = captures.filter(capture => 
-      capture && capture.timestamp && capture.timestamp > ninetyDaysAgo
-    );
-    
-    if (filteredCaptures.length < captures.length) {
-      await chrome.storage.local.set({ captures: filteredCaptures });
-      console.log(`Cleaned up ${captures.length - filteredCaptures.length} old captures`);
+    const cutoff = Date.now() - (90 * 24 * 60 * 60 * 1000);
+    const filtered = captures.filter(c => c?.timestamp > cutoff);
+    if (filtered.length < captures.length) {
+      await chrome.storage.local.set({ captures: filtered });
     }
-  } catch (e) {
-    console.error('Cleanup error:', e);
-}
-}, 24 * 60 * 60 * 1000); // Run daily
+  } catch (e) {}
+}, 24 * 60 * 60 * 1000);

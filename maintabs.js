@@ -1,111 +1,57 @@
-document.getElementById("goTabs").onclick = () => {
-  window.location.href = "tabs.html";
-};
+document.getElementById("goTabs").onclick = () => window.location.href = "tabs.html";
+document.getElementById("goMessages").onclick = () => window.location.href = "popup.html";
 
-document.getElementById("goMessages").onclick = () => {
-  window.location.href = "popup.html";
-};
-
-// Open Facebook in a new tab
-const goFacebookBtn = document.getElementById("goFacebook");
-if (goFacebookBtn) {
-  goFacebookBtn.addEventListener("click", () => {
-    try {
-      // Open in a new tab
-      window.open("https://www.facebook.com", "_blank");
-    } catch (e) {
-      // Fallback to changing location if popup blocked
-      window.location.href = "https://www.facebook.com";
-    }
-  });
-}
-
-// Lofi Particle Animation
 function createParticles() {
-    const particlesContainer = document.getElementById("particles");
-    const particleCount = 15;
-    const width = 280;
-    const height = 380;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement("div");
-        particle.className = "particle";
-        
-        // Random size
+    const container = document.getElementById("particles");
+    if (!container) return;
+    const width = 280, height = 380;
+    for (let i = 0; i < 15; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
         const size = Math.random();
-        if (size < 0.33) {
-            particle.classList.add("particle-small");
-        } else if (size < 0.66) {
-            particle.classList.add("particle-medium");
-        } else {
-            particle.classList.add("particle-large");
-        }
-        
-        // Random position
-        particle.style.left = Math.random() * width + "px";
-        particle.style.top = Math.random() * height + "px";
-        
-        // Random animation delay
-        particle.style.animationDelay = Math.random() * 5 + "s";
-        
-        // Mouse interaction
-    particle.addEventListener("mouseenter", function () {
+        if (size < 0.33) p.classList.add("particle-small");
+        else if (size < 0.66) p.classList.add("particle-medium");
+        else p.classList.add("particle-large");
+        p.style.left = Math.random() * width + "px";
+        p.style.top = Math.random() * height + "px";
+        p.style.animationDelay = Math.random() * 5 + "s";
+        p.addEventListener("mouseenter", function() {
             this.style.transform = "scale(2.5)";
             this.style.opacity = "1";
-      this.style.boxShadow =
-        "0 0 25px rgba(167, 139, 250, 0.9), 0 0 50px rgba(167, 139, 250, 0.7)";
+            this.style.boxShadow = "0 0 25px rgba(167, 139, 250, 0.9), 0 0 50px rgba(167, 139, 250, 0.7)";
         });
-        
-    particle.addEventListener("mouseleave", function () {
+        p.addEventListener("mouseleave", function() {
             this.style.transform = "";
             this.style.opacity = "";
             this.style.boxShadow = "";
         });
-        
-        particlesContainer.appendChild(particle);
+        container.appendChild(p);
     }
 }
-
-// Initialize particles when page loads
 createParticles();
 
-// Global mouse interaction - particles react to mouse movement
-let mouseX = 0;
-let mouseY = 0;
-
+let mouseX = 0, mouseY = 0;
 document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    
-    const particles = document.querySelectorAll(".particle");
-    particles.forEach((particle) => {
-        const rect = particle.getBoundingClientRect();
-        const particleX = rect.left + rect.width / 2;
-        const particleY = rect.top + rect.height / 2;
-        
-        const dx = mouseX - particleX;
-        const dy = mouseY - particleY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // React when mouse is within 80px
-        if (distance < 80) {
-            const force = (80 - distance) / 80;
+    document.querySelectorAll(".particle").forEach((p) => {
+        const rect = p.getBoundingClientRect();
+        const px = rect.left + rect.width / 2;
+        const py = rect.top + rect.height / 2;
+        const dx = mouseX - px, dy = mouseY - py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 80) {
+            const force = (80 - dist) / 80;
             const angle = Math.atan2(dy, dx);
-            const pushDistance = force * 15;
-            
-      particle.style.transform = `translate(${
-        Math.cos(angle) * pushDistance
-      }px, ${Math.sin(angle) * pushDistance}px) scale(${1 + force * 0.5})`;
-            particle.style.opacity = 0.6 + force * 0.4;
+            const push = force * 15;
+            p.style.transform = `translate(${Math.cos(angle) * push}px, ${Math.sin(angle) * push}px) scale(${1 + force * 0.5})`;
+            p.style.opacity = 0.6 + force * 0.4;
         }
     });
 });
-
-// Reset particles when mouse leaves
 document.addEventListener("mouseleave", () => {
-    const particles = document.querySelectorAll(".particle");
-    particles.forEach((particle) => {
-        particle.style.transform = "";
-        particle.style.opacity = "";
+    document.querySelectorAll(".particle").forEach((p) => {
+        p.style.transform = "";
+        p.style.opacity = "";
     });
 });

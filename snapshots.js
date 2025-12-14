@@ -1,6 +1,4 @@
-// snapshots.js - handles listing, saving, opening, and deleting snapshots
 (function () {
-  // storage helpers
   function storageGet(key) {
     return new Promise((res) => chrome.storage.local.get(key, res));
   }
@@ -51,7 +49,6 @@
       await saveSnapshots(snaps);
       return snap;
     } catch (e) {
-      console.error("createSnapshot error", e);
       return null;
     }
   }
@@ -68,12 +65,9 @@
     if (!snap) return;
     const urls = snap.entries.map((e) => e.url).filter(Boolean);
     if (!urls.length) return;
-    chrome.windows.create({ url: urls }, (w) => {
-      console.log("opened snapshot", snap.name, w && w.id);
-    });
+    chrome.windows.create({ url: urls });
   }
 
-  // Modal for naming snapshot
   function showSaveModal(defaultName) {
     return new Promise((res) => {
       const overlay = document.createElement("div");
@@ -163,7 +157,6 @@
     }
   }
 
-  // Wire buttons
   document.addEventListener("DOMContentLoaded", () => {
     const createBtn = document.getElementById("createSnapshotBtn");
     const backBtn = document.getElementById("backBtn");

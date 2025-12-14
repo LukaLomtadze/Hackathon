@@ -20,11 +20,12 @@ body {
     color: var(--text-light);
     font-family: var(--font-main);
     font-weight: 500;
-    padding: 20px 15px;
+    padding: 10px 15px;
     width: 280px;
     margin: 0;
     text-align: center;
-    min-height: 380px;
+    min-height: auto;
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -193,10 +194,10 @@ h2::after {
 .buttonClass {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin: 12px auto;
+    gap: 6px;
+    margin: 8px auto;
     align-items: center;
-    padding: 12px 15px;
+    padding: 8px 12px;
     background: rgba(167, 139, 250, 0.02);
     backdrop-filter: var(--blur);
     -webkit-backdrop-filter: var(--blur);
@@ -236,9 +237,9 @@ h2::after {
     -webkit-backdrop-filter: var(--blur);
     color: var(--purple);
     border: 1px solid rgba(167, 139, 250, 0.2);
-    padding: 10px 20px;
-    border-radius: 14px;
-    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 12px;
     cursor: pointer;
     font-weight: 600;
     transition: var(--transition);
